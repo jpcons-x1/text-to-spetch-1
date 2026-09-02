@@ -1,115 +1,140 @@
-# Narrador Comercial AI - Conversor de Texto a Voz (Edge TTS)
+# Text-to-Speech Videos
 
-Este proyecto implementa una soluci√≥n local y profesional para convertir guiones y textos en narraciones de voz comercial de alta calidad en espa√±ol. Utiliza la tecnolog√≠a de s√≠ntesis de voz neuronal de Microsoft Edge a trav√©s de la librer√≠a `edge-tts`, lo que permite obtener locuciones humanas realistas con ajuste fino de velocidad y tono.
+AplicaciÛn local para generar voces narradas en espaÒol a partir de textos o guiones, usando Microsoft Edge TTS. El proyecto combina una interfaz web moderna con una herramienta de lÌnea de comandos para producir archivos de audio listos para usar en videos, anuncios, tutoriales y presentaciones.
 
-El proyecto est√° dise√±ado para funcionar de dos formas complementarias:
-1.  **Terminal (CLI - `narrador.py`)**: Para procesamiento por lotes o conversiones r√°pidas de archivos de texto directamente desde la l√≠nea de comandos.
-2.  **Interfaz Gr√°fica Local (Web Dashboard - `app.py` + `index.html`)**: Una aplicaci√≥n web interactiva y moderna (dise√±o premium estilo modo oscuro con efecto *glassmorphism*) que permite escribir guiones, previsualizar locuciones cortas en tiempo real, ajustar velocidad y tono mediante sliders, y gestionar las descargas directamente desde el navegador.
+## DescripciÛn general
 
----
-- ## Estructura del Proyecto
-  
-  ```text
-  ‚îú‚îÄ‚îÄ venv/                # Entorno virtual de Python (aislado)
-  ‚îú‚îÄ‚îÄ salidas/             # Directorio de almacenamiento f√≠sico de audios (.mp3)
-  ‚îú‚îÄ‚îÄ requirements.txt     # Archivo de dependencias (edge-tts)
-  ‚îú‚îÄ‚îÄ narrador.py          # Script CLI interactivo
-  ‚îú‚îÄ‚îÄ app.py               # Servidor web local de API y archivos
-  ‚îú‚îÄ‚îÄ index.html           # Dashboard frontend premium
-  ‚îú‚îÄ‚îÄ texto_ejemplo.txt    # Ejemplo de gui√≥n de ventas para pruebas
-  ‚îî‚îÄ‚îÄ README.md            # Documentaci√≥n del proyecto (este archivo)
-  ```
-  
-  ---
-- ## Detalles de la Arquitectura
-  
-  ```mermaid
-  graph TD
-    User([Usuario]) -->|Usa CLI| CLI[narrador.py]
-    User -->|Usa Navegador| Web[index.html]
-    Web -->|API Requests| Server[app.py HTTP Server]
-    CLI -->|asyncio| EdgeTTS[edge-tts Library]
-    Server -->|asyncio| EdgeTTS
-    EdgeTTS -->|WebSockets| MS[Microsoft Azure TTS Service]
-    MS -->|Audio Stream| EdgeTTS
-    EdgeTTS -->|Guarda .mp3| Folder[(salidas/)]
-    Server -->|Sirve .mp3 y datos| Web
-  ```
-- ### Componentes:
-  *   **Backend (Python Standard Library):** Implementado con `http.server.BaseHTTPRequestHandler` y `socketserver.ThreadingMixIn` para habilitar el procesamiento en hilos separados sin necesidad de dependencias robustas como Django o FastAPI.
-  *   **Motor TTS (edge-tts):** Se conecta a los servicios de locuci√≥n neuronal de Microsoft a trav√©s de WebSockets de manera as√≠ncrona mediante `asyncio`.
-  *   **Frontend (HTML5 + CSS + JavaScript Vanilla):** Dise√±ado con un sistema de cuadr√≠cula responsivo, animaciones din√°micas, sliders fluidos y un reproductor de audio nativo personalizado. Utiliza [Lucide Icons](https://lucide.dev/) para la iconograf√≠a y fuentes de Google Fonts (Outfit & Inter).
-  
-  ---
-- ## Especificaciones y Requisitos
-  
-  *   **Sistema Operativo:** Windows, macOS o Linux (probado en Windows con PowerShell y CMD).
-  *   **Python:** Versi√≥n `3.7` o superior (probado con Python `3.13.11`).
-  *   **Conexi√≥n a Internet:** Requerida durante la generaci√≥n de audio (ya que la librer√≠a se comunica directamente con las APIs de voz de Microsoft Edge).
-  *   **Espacio de Almacenamiento:** M√≠nimo (menos de 50 MB para la instalaci√≥n; los audios MP3 ocupan ~1 MB por cada 10 minutos de locuci√≥n).
-  
-  ---
-- ## Instrucciones de Instalaci√≥n y Configuraci√≥n
-  
-  Sigue estos pasos en tu terminal para configurar el proyecto en un entorno virtual aislado:
-- ### 1. Clonar o Ubicarse en el Proyecto
-  Abre la consola en el directorio ra√≠z del proyecto:
-  `d:/11.DaVinci_Resolve_20_curso/TEXTTOSPETCH-VIDEOS`
-- ### 2. Crear el Entorno Virtual
-  Crea un entorno de Python llamado `venv` para no instalar dependencias globales:
-  ```powershell
-  python -m venv venv
-  ```
-- ### 3. Instalar Dependencias
-  Instala los paquetes necesarios directamente en el entorno virtual:
-  ```powershell
-  # En Windows (PowerShell/CMD)
-  .\venv\Scripts\pip.exe install -r requirements.txt
-  ```
-  
-  ---
-- ## Gu√≠a de Uso
-- ### 1. Interfaz Web (Recomendado)
-  
-  La interfaz visual te permite ajustar de manera interactiva la velocidad de la voz, el tono y probar fragmentos antes de renderizar audios completos.
-  
-  1.  **Inicia el servidor local:**
-    ```powershell
-    .\venv\Scripts\python.exe app.py
-    ```
-  2.  **Abre el Dashboard en tu navegador:**
-    Ve a [http://localhost:8000](http://localhost:8000).
-  3.  **Din√°mica de Uso:**
-    *   Escribe tu texto en el editor principal.
-    *   Selecciona tu voz y escribe un nombre para tu archivo.
-    *   Usa los controles deslizantes para acelerar/ralentizar la voz u oscurecer/agudizar el tono.
-    *   Haz clic en **Probar Fragmento** para escuchar los primeros 100 caracteres.
-    *   Haz clic en **Generar Audio Completo** para guardarlo en la lista. Puedes descargarlo o eliminarlo usando los controles de la tarjeta.
-  
-  ---
-- ### 2. Consola de Comandos (CLI)
-  
-  Puedes usar `narrador.py` para procesar textos de forma directa.
-- #### Par√°metros Disponibles:
-  *   `-t`, `--texto`: Texto directo a sintetizar (entre comillas).
-  *   `-f`, `--archivo`: Ruta de un archivo `.txt` que contiene el gui√≥n.
-  *   `-v`, `--voz`: Identificador de la voz de Edge TTS (defecto: `es-MX-JorgeNeural`).
-  *   `-r`, `--velocidad`: Velocidad de la voz en porcentaje (ej: `+10%`, `-5%`).
-  *   `-p`, `--tono`: Tono de la voz en Hertz (ej: `+5Hz`, `-3Hz`).
-  *   `-o`, `--salida`: Nombre del archivo de salida en `salidas/` (ej: `promo_ventas.mp3`).
-  *   `--list-voces`: Lista en la consola las voces recomendadas en espa√±ol.
-- .\venv\Scripts\python.exe narrador.py --texto "¬°Oferta especial de fin de a√±o! Compra ahora y obt√©n 50% de descuento." --voz es-ES-AlvaroNeural --velocidad +15% --salida promocion.mp3
-- ## Voces Neuronal Recomendadas en Espa√±ol
-  
-  | C√≥digo de Voz | Regi√≥n / Acento | G√©nero | Tono de Voz y Uso Recomendado |
-  | :--- | :--- | :--- | :--- |
-  | **`es-MX-JorgeNeural`** | M√©xico | Masculino | **Muy en√©rgico, vendedor, persuasivo.** Ideal para anuncios y promociones de alto impacto. |
-  | **`es-MX-DaliaNeural`** | M√©xico | Femenino | **C√°lido, profesional y asertivo.** Excelente para videos explicativos y ventas suaves. |
-  | **`es-ES-AlvaroNeural`** | Espa√±a | Masculino | **Corporativo, formal, locutor maduro.** Recomendado para videos de negocios y documentales corporativos. |
-  | **`es-ES-ElviraNeural`** | Espa√±a | Femenino | **Limpio, pausado, institucional.** Excelente para narraci√≥n corporativa y e-learning. |
-  | **`es-CO-GonzaloNeural`** | Colombia | Masculino | **Neutro, expresivo, amigable.** Estilo tutoriales y videos explicativos en YouTube. |
-  | **`es-CO-SalomeNeural`** | Colombia | Femenino | **Profesional, claro.** Perfecto para centralitas telef√≥nicas y videos institucionales. |
-  | **`es-US-AlonsoNeural`** | EE.UU. / Latino | Masculino | **Latino neutro, moderno y juvenil.** Recomendado para narrar redes sociales (TikTok/Reels). |
-  | **`es-US-PalomaNeural`** | EE.UU. / Latino | Femenino | **Latino neutro, fluido.** Ideal para audiolibros y podcasts. |
-  
-  *(Nota: Para obtener un listado de todas las voces disponibles en la nube de Microsoft Edge, ejecuta `.\venv\Scripts\python.exe -m edge_tts --list-voices` en tu terminal).*
+Este repositorio permite:
+
+- convertir textos largos o cortos en audio con voces naturales de Microsoft Edge TTS;
+- ajustar velocidad y tono de la voz;
+- generar archivos MP3 locales;
+- probar fragmentos de audio antes de renderizar el archivo completo;
+- operar desde navegador o desde consola.
+
+La soluciÛn est· pensada para uso profesional, local y r·pido, sin depender de servicios externos complejos ni de un backend pesado.
+
+## CaracterÌsticas principales
+
+- Interfaz web con diseÒo oscuro y estilo premium.
+- GeneraciÛn de audio con voces neuronales en espaÒol.
+- Soporte para texto directo o archivos .txt.
+- Ajuste de velocidad y tono mediante controles visuales.
+- ReproducciÛn previa de fragmentos antes de exportar.
+- ExportaciÛn de archivos MP3 en la carpeta de salida.
+- CLI para automatizar generaciÛn por lotes o scripts.
+
+## Estructura del proyecto
+
+```text
+.
++-- app.py               # Servidor web y lÛgica backend local
++-- index.html           # Frontend web de la interfaz de usuario
++-- narrador.py          # Script de consola para TTS por CLI
++-- requirements.txt     # Dependencias del proyecto
++-- texto_ejemplo.txt    # Texto de ejemplo para pruebas
++-- README.md            # DocumentaciÛn del proyecto
++-- salidas/             # Carpeta de salida para archivos audio
++-- logseq/              # Archivos de notas o contenido auxiliar
++-- pages/               # P·ginas de documentaciÛn del proyecto
++-- whiteboards/         # Datos de whiteboard del flujo de trabajo
++-- journals/            # Registros del proyecto
++-- venv/                # Entorno virtual local (ignorado por git)
++-- .gitignore           # Reglas para excluir artefactos locales
++-- voces.xlsx           # Archivo de referencia de voces
+```
+
+## Requisitos
+
+- Python 3.8 o superior
+- Internet para acceder al servicio de voces de Microsoft Edge
+- Sistema operativo compatible con Python: Windows, macOS o Linux
+
+## InstalaciÛn
+
+1. Clona el repositorio o entra a la carpeta del proyecto.
+2. Crea un entorno virtual.
+
+```powershell
+python -m venv venv
+```
+
+3. Activa el entorno virtual.
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+4. Instala las dependencias.
+
+```powershell
+pip install -r requirements.txt
+```
+
+## Uso web
+
+Inicia la aplicaciÛn:
+
+```powershell
+python app.py
+```
+
+Luego abre en tu navegador:
+
+```text
+http://localhost:8000
+```
+
+Desde la interfaz puedes:
+
+- escribir o pegar texto;
+- elegir una voz;
+- ajustar velocidad y tono;
+- escuchar una vista previa corta;
+- generar y descargar el audio completo.
+
+## Uso desde lÌnea de comandos
+
+Ejemplo b·sico:
+
+```powershell
+.\venv\Scripts\python.exe narrador.py --texto "°Oferta especial de fin de aÒo! Compra ahora y obtÈn 50% de descuento." --voz es-ES-AlvaroNeural --velocidad +15% --salida promocion.mp3
+```
+
+Par·metros principales:
+
+- -t, --texto: texto directo para sintetizar.
+- -f, --archivo: ruta a un archivo .txt.
+- -v, --voz: identificador de la voz.
+- -r, --velocidad: velocidad de lectura.
+- -p, --tono: tono de la voz.
+- -o, --salida: nombre del archivo de salida.
+- --list-voces: lista voces recomendadas y disponibles.
+
+## Voces recomendadas en espaÒol
+
+| Voz | RegiÛn | Tipo | Uso recomendado |
+| --- | --- | --- | --- |
+| es-MX-JorgeNeural | MÈxico | Masculino | promociones y anuncios muy din·micos |
+| es-MX-DaliaNeural | MÈxico | Femenino | ventas y narraciÛn c·lida |
+| es-ES-AlvaroNeural | EspaÒa | Masculino | tonos profesionales y corporativos |
+| es-ES-ElviraNeural | EspaÒa | Femenino | narraciÛn formal y clara |
+| es-CO-GonzaloNeural | Colombia | Masculino | tutoriales y explicaciones |
+| es-CO-SalomeNeural | Colombia | Femenino | contenido institucional y amable |
+
+## Flujo de trabajo sugerido
+
+1. Escribe el guion en el editor o en un archivo .txt.
+2. Ajusta la voz, velocidad y tono.
+3. Reproduce una vista previa.
+4. Genera el audio final.
+5. Guarda el archivo en la carpeta salidas.
+6. Importa el audio al proyecto de video final en DaVinci Resolve o ediciÛn de video.
+
+## Licencia
+
+Este proyecto se distribuye con fines educativos y de desarrollo local. Puedes adaptarlo seg˙n tus necesidades personales o profesionales.
+
+## Autor o nota
+
+Proyecto orientado a la generaciÛn de voces profesionales para contenido audiovisual y narraciÛn de guiones de marketing, tutoriales, presentaciones y videos digitales.
