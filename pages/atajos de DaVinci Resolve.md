@@ -1,0 +1,13 @@
+- teclado personalizado
+	- w - corta  seco
+	- q - corta y propaga a la izquierda (con la opcion de recorte "T" activada)
+	- e - corta y propaga a la derecha (con la opcion de recorte "T" activada)
+	- espacio - reproduce  el clip y lo detiene
+	- supr -  elima una seccion seleccioada haciendo la propagación.
+	- borrar -  elimina una seccion dejando el espacio vacio en medio
+	- ALT + Y  - selecciona todos los clip que estan  por delante del cabezal para poder mover y arrastrar todo el conjunto sin que se solapen
+	- CTR - Y  hace lo mismo que el anterior pero selecionado todo lo de la derecha
+	- manten siempre activado el imancito de atraer magnetico ("N")
+	- CTR + RATON   - se mueve por la linea de tiempo
+	- ALT + RATON   -  expande la linea de tiempo
+	-
